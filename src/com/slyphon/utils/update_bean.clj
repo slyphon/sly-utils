@@ -15,7 +15,8 @@
 
 (defmacro update-bean
   ([obj props-map]
-     (let [props (cond (map? props-map)     (seq props-map)
+     (let [&env  clojure.lang.Compiler/LOCAL_ENV
+           props (cond (map? props-map)     (seq props-map)
                        (get &env props-map) (seq (&env props-map))
                        :else                (seq (eval props-map)))
            
