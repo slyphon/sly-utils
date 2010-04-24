@@ -13,6 +13,7 @@
 (defn #^String camelize [s]
   (re-gsub #"(?:^|_|-)(.)" (fn [[_ ch & rest]] (.toUpperCase ch)) (as-str s)))
 
+#_
 (defmacro update-bean
   ([obj props-map]
      (let [&env  clojure.lang.Compiler/LOCAL_ENV
@@ -25,3 +26,12 @@
            dots  (map (fn [k v] `(. ~k ~v)) ks vs)]
        `(doto ~obj ~@dots))))
 
+(defmacro update-bean
+  [obj props-map]
+  `(let [obj#       ~obj
+         props-map# ~props-map
+         dots# (map (fn [[k# v#]]
+                      `(. ~(->> k# as-str camelize upcase (str "set") symbol) ~v#))
+                    props-map#)
+         doto# `(doto ~obj# ~@dots#)]
+     (eval doto#)))
